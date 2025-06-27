@@ -10,26 +10,22 @@ import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
 
-
 @RestController
-@RequestMapping("/api/order-items") // URL base para OrderItems
+@RequestMapping("/api/order-items")
 public class OrderItemController {
 
-    private final OrderItemService orderItemService; // <--- Injeção via construtor (melhor prática)
+    private final OrderItemService orderItemService;
 
-    // Injeção de dependência via construtor
+
     public OrderItemController(OrderItemService orderItemService) {
         this.orderItemService = orderItemService;
     }
 
-    // Criar novo item de pedido
-    // Este endpoint só faz sentido se você criar OrderItems DEPOIS de uma Order existente.
-    // Ele precisa do ID da Order na URL.
-    @PostMapping("/{orderId}") // <--- ROTA CORRIGIDA: Inclui o orderId na URL
+    @PostMapping("/{orderId}")
     public ResponseEntity<OrderItemResponseDTO> create(
-            @PathVariable("orderId") Long orderId, // <--- ADICIONADO: Recebe o ID da Order da URL
+            @PathVariable("orderId") Long orderId,
             @RequestBody OrderItemRequestDTO dto) {
-        OrderItemResponseDTO response = orderItemService.create(orderId, dto); // <--- PASSA O orderId
+        OrderItemResponseDTO response = orderItemService.create(orderId, dto);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
@@ -42,7 +38,7 @@ public class OrderItemController {
 
     // Buscar item por ID
     @GetMapping("/{id}")
-    public ResponseEntity<?> show(@PathVariable long id) { // Note: 'long' pode ser 'Long' para consistência
+    public ResponseEntity<?> show(@PathVariable long id) {
         try {
             OrderItemResponseDTO item = orderItemService.show(id);
             return new ResponseEntity<>(item, HttpStatus.OK);
@@ -54,10 +50,10 @@ public class OrderItemController {
     // Atualizar item de pedido
     @PatchMapping("/{id}")
     public ResponseEntity<?> update(
-            @PathVariable("id") Long id, // <--- ADICIONADO: Recebe o ID do item da URL
-            @RequestBody OrderItemRequestDTO dto) { // <--- DTO de requisição para update também
+            @PathVariable("id") Long id,
+            @RequestBody OrderItemRequestDTO dto) {
         try {
-            OrderItemResponseDTO updated = orderItemService.update(id, dto); // <--- PASSA O ID
+            OrderItemResponseDTO updated = orderItemService.update(id, dto);
             return new ResponseEntity<>(updated, HttpStatus.OK);
         } catch (RuntimeException e) {
             return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
@@ -66,7 +62,7 @@ public class OrderItemController {
 
     // Deletar item de pedido
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> destroy(@PathVariable long id) { // Note: 'long' pode ser 'Long' para consistência
+    public ResponseEntity<String> destroy(@PathVariable long id) {
         try {
             orderItemService.destroy(id);
             return new ResponseEntity<>("Item deletado com sucesso.", HttpStatus.OK);

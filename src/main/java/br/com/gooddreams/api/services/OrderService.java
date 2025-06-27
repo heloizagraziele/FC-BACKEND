@@ -37,11 +37,9 @@ public class OrderService {
     }
 
     @Transactional
-    public OrderResponseDTO createOrder(OrderCreateRequestDTO dto) { // DTO de entrada é OrderCreateRequestDTO
+    public OrderResponseDTO createOrder(OrderCreateRequestDTO dto) {
         Customer customer = customerRepository.findById(dto.customerId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
-
-        Address deliveryAddress;
 
         Order order = new Order();
         order.setCustomer(customer);
@@ -50,18 +48,18 @@ public class OrderService {
         order.setPaymentMethod(PaymentMethod.CREDIT_CARD);
         order.setPaymentMethod(null);
 
-        // Buscar todos os produtos do DTO de uma vez para evitar N+1 no mapper
+
         List<Long> productIds = dto.items().stream()
                 .map(item -> item.productId())
                 .collect(Collectors.toList());
         List<Product> productsInOrder = productRepository.findAllById(productIds);
-        // Opcional: Validar se todos os produtos foram encontrados aqui
+
 
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<OrderItem> orderItems = new java.util.ArrayList<>();
 
-        // Itera sobre OrderItemRequestDTOs que estão dentro do OrderCreateRequestDTO
-        for (OrderItemRequestDTO itemDto : dto.items()) { // <--- itemDto é do tipo OrderItemRequestDTO
+
+        for (OrderItemRequestDTO itemDto : dto.items()) {
             Product product = productsInOrder.stream()
                     .filter(p -> p.getId().equals(itemDto.productId()))
                     .findFirst()
@@ -80,24 +78,24 @@ public class OrderService {
         return OrderMapper.toDTO(savedOrder);
     }
 
-    // Listar todos os pedidos
+
     @Transactional
     public List<OrderResponseDTO> list() {
         return orderRepository.findAll().stream()
-                .map(OrderMapper::toDTO) // <--- Use o OrderMapper
+                .map(OrderMapper::toDTO)
                 .toList();
     }
 
-    // Buscar pedido por ID
+
     @Transactional
     public OrderResponseDTO show(long id) {
         Order order = orderRepository.findById(id).orElseThrow(() ->
                 new RuntimeException("Pedido com o id " + id + " não foi encontrado.")
         );
-        return OrderMapper.toDTO(order); // <--- Use o OrderMapper
+        return OrderMapper.toDTO(order);
     }
 
-    // Atualizar pedido
+
     @Transactional
     public OrderResponseDTO update(Long id, OrderUpdateDTO dto) {
         Order order = orderRepository.findById(id).orElseThrow(() ->
@@ -112,10 +110,10 @@ public class OrderService {
         }
 
         Order updatedOrder = orderRepository.save(order);
-        return OrderMapper.toDTO(updatedOrder); // <--- Use o OrderMapper
+        return OrderMapper.toDTO(updatedOrder);
     }
 
-    // Deletar pedido
+
     @Transactional
     public void destroy(long id) {
         Order order = orderRepository.findById(id).orElseThrow(() ->

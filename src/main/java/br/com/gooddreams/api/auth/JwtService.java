@@ -14,14 +14,13 @@ import java.util.Date;
 @Service
 public class JwtService {
 
-    private final SecretKey secretKey; // <--- Apenas declare, não inicialize aqui
+    private final SecretKey secretKey;
 
     private final long expiration = 1000 * 60 * 60 * 24;
 
-    // CONSTRUTOR: Injeta o valor da chave secreta do application.properties
-    // e usa-o para inicializar 'secretKey' de forma consistente
+
     public JwtService(@Value("${jwt.secret.key}") String secretKeyBase64) {
-        // Decodifica a chave Base64 do properties para um SecretKey
+
         this.secretKey = Keys.hmacShaKeyFor(Base64.getDecoder().decode(secretKeyBase64));
     }
 

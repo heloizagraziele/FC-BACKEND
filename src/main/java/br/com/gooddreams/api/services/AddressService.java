@@ -25,17 +25,13 @@ public class AddressService {
     @Autowired
     AddressRepository addressRepository;
 
-    @Transactional // Adicione @Transactional para o método store
+    @Transactional
     public AddressResponseDTO store(AddressCreateDTO dto) {
         Customer customer = customerRepository.findById(dto.customerId())
                 .orElseThrow(() -> new RuntimeException("Cliente com id " + dto.customerId() + " não encontrado"));
 
-        // --- CORREÇÃO AQUI: PASSE A ENTIDADE CUSTOMER PARA O MAPPER ---
-        Address address = AddressMapper.toEntity(dto, customer); // <--- MUDANÇA AQUI
-        // ---------------------------------------------------------------
 
-        // A linha address.setCustomer(customer); abaixo deve ser removida
-        // se o mapper já faz (e ele faz agora).
+        Address address = AddressMapper.toEntity(dto, customer);
 
         Address saved = addressRepository.save(address);
         return AddressMapper.toDTO(saved);
@@ -52,20 +48,16 @@ public class AddressService {
         return AddressMapper.toDTO(address);
     }
 
-    @Transactional // <--- Adicione @Transactional para garantir a transação na atualização
-    public AddressResponseDTO update(Long id_address, AddressUpdateDTO dto) { // <--- ASSINATURA CORRIGIDA: Recebe id_address
-        // 1. Encontrar o endereço pelo ID vindo da URL
-        Address address = addressRepository.findById(id_address) // <--- USE O ID_ADDRESS DO PARÂMETRO
+    @Transactional
+    public AddressResponseDTO update(Long id_address, AddressUpdateDTO dto) {
+
+        Address address = addressRepository.findById(id_address)
                 .orElseThrow(() -> new RuntimeException("Endereço não encontrado com ID: " + id_address));
 
-        // 2. Aplicar as atualizações parciais (PATCH)
-        // Apenas atualize os campos se eles vierem não nulos no DTO.
-        // Se o seu frontend SEMPRE envia todos os campos (mesmo os não alterados),
-        // você pode simplesmente setar todos eles. Mas a lógica abaixo é para PATCH "verdadeiro".
         if (dto.street() != null) {
             address.setStreet(dto.street());
         }
-        if (dto.number() != null) { // Note: numbers can be empty strings from forms, handle as needed
+        if (dto.number() != null) {
             address.setNumber(dto.number());
         }
         if (dto.neighborhood() != null) {
@@ -83,16 +75,7 @@ public class AddressService {
         if (dto.zipcode() != null) {
             address.setZipcode(dto.zipcode());
         }
-
-        // REMOÇÃO IMPORTANTE: NÃO atualize o cliente (dono do endereço)
-        // em um PATCH de endereço. O cliente já está associado e o endpoint
-        // é para o endereço em si. Se precisar reassociar, seria outra lógica/endpoint.
-        // address.setCustomer(customer); // <--- REMOVA ESTA LINHA E A BUSCA DE CLIENTE ACIMA
-
-        // 3. Salvar as alterações
         Address updatedAddress = addressRepository.save(address);
-
-        // 4. Retornar o DTO da resposta
         return AddressMapper.toDTO(updatedAddress);
     }
 
@@ -103,15 +86,11 @@ public class AddressService {
     }
 
     public List<AddressResponseDTO> getAddressesByCustomerId(Long customerId) {
-        // Busca o Customer para garantir que ele existe
+
         Customer customer = customerRepository.findById(customerId)
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado com ID: " + customerId));
 
-        // Retorna a lista de endereços associados a este cliente
-        // Você pode ter um método findByCustomerId no AddressRepository para otimizar
-        // List<Address> addresses = addressRepository.findByCustomerId(customerId);
-        // Ou, se a entidade Customer mapeia seus endereços:
-        List<Address> addresses = customer.getAddresses(); // Assumindo que Customer tem getAddresses() e @OneToMany com Address
+        List<Address> addresses = customer.getAddresses();
 
         return addresses.stream()
                 .map(AddressMapper::toDTO)

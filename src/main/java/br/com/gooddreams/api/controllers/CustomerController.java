@@ -35,7 +35,6 @@ public class CustomerController {
         this.jwtService = jwtService;
     }
 
-    // --- CORREÇÃO: RETORNAR AUTHRESPONSEDTO COMPLETO COM EMAIL ---
     @PostMapping("/auth")
     public ResponseEntity<AuthResponseDTO> auth(@RequestBody AuthRequestDTO authDTO) {
         System.out.println("LOGIN TENTADO: " + authDTO.email());
@@ -75,21 +74,6 @@ public class CustomerController {
         }
     }
 
-    // --- REMOVIDO: Método getAddresses será movido para AddressController ---
-    // @GetMapping("/customers/addresses/{id}")
-    // public ResponseEntity<List<AddressResponseDTO>> getAddresses(@PathVariable Long id) {
-    //     Customer customer = customerRepository.findById(id)
-    //             .orElseThrow(() -> new RuntimeException("Cliente não encontrado"));
-    //
-    //     List<Address> addresses = customer.getAddresses();
-    //     List<AddressResponseDTO> dtos = addresses.stream()
-    //             .map(AddressMapper::toDTO)
-    //             .toList();
-    //
-    //     return ResponseEntity.ok(dtos);
-    // }
-    // ----------------------------------------------------------------------
-
     @PatchMapping
     public ResponseEntity<?> update(@RequestBody CustomerUpdateDTO customerUpdateDTO) {
         try {
@@ -99,10 +83,6 @@ public class CustomerController {
         }
     }
 
-    // Você tem dois métodos @PatchMapping sem rota específica ou com rotas duplicadas.
-    // O segundo @PatchMapping("/{id_customer}") parece mais completo. Mantenha um ou ajuste as rotas.
-    // Exemplo: @PatchMapping("/{id_customer}") para atualização por ID específica.
-    // Se o de cima for para atualização do próprio usuário autenticado, use /me.
     @PatchMapping("/{id_customer}")
     public ResponseEntity<?> updateCustomer(@PathVariable("id_customer") Long id_customer,
                                             @RequestBody CustomerUpdateDTO customerUpdateDTO) {

@@ -41,7 +41,6 @@ public class AuthController {
 
         String token = jwtService.generateToken(customer);
 
-        // <--- AQUI ESTÁ A MUDANÇA PRINCIPAL: Incluir o customer.getEmail()
         return ResponseEntity.ok(new AuthResponseDTO(token, customer.getName(), customer.getEmail(), customer.getId()));
     }
 }

@@ -90,21 +90,21 @@ public class PaymentService {
             Payment savedPayment = paymentRepository.save(payment);
             System.out.println("PaymentService: Payment salvo no contexto com ID: " + savedPayment.getId() + " e status: " + savedPayment.getPaymentStatus());
 
-            // --- Atualizando o orderStatus e paymentMethod na entidade Order ---
-            if (order != null) { // Removido 'status == PaymentStatus.PAID' para depuração inicial
+
+            if (order != null) {
                 order.setStatus(OrderStatus.PAYED);
                 order.setPaymentMethod(method);
                 System.out.println("PaymentService: Tentando salvar Order " + order.getId() + " com status: " + order.getStatus() + " e método: " + order.getPaymentMethod());
                 orderRepository.save(order);
                 System.out.println("PaymentService: Order " + order.getId() + " salva no contexto com status: " + order.getStatus() + " e método: " + order.getPaymentMethod());
             }
-            // ------------------------------------------------------------------
+
 
             return savedPayment;
         } catch (Exception e) {
             System.err.println("PaymentService: ERRO CRÍTICO ao tentar salvar pagamento/ordem: " + e.getMessage());
-            e.printStackTrace(); // Imprime o stack trace completo para depuração
-            throw new RuntimeException("Erro ao processar pagamento e ordem: " + e.getMessage(), e); // Relança a exceção para que o Spring a capture
+            e.printStackTrace();
+            throw new RuntimeException("Erro ao processar pagamento e ordem: " + e.getMessage(), e);
         }
     }
 }

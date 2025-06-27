@@ -1,9 +1,9 @@
 package br.com.gooddreams.api.dtos;
 
-import br.com.gooddreams.api.enuns.OrderStatus; // Importe OrderStatus
-import java.math.BigDecimal; // Importe BigDecimal
-import java.time.Instant; // Importe Instant
-import java.util.List; // Importe List
+import br.com.gooddreams.api.enuns.OrderStatus;
+import java.math.BigDecimal;
+import java.time.Instant;
+import java.util.List;
 
 public record OrderResponseDTO(
         Long id,

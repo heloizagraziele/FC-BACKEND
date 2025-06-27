@@ -21,14 +21,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
     private final JwtService jwtService;
 
-    // Use o CustomerRepository diretamente para carregar o Customer no JwtFilter,
-    // pois o UserDetailsServiceImpl pode ter lógica de segurança extra que não queremos aqui.
     @Autowired
-    private CustomerRepository customerRepository; // Adicionado injeção do CustomerRepository
+    private CustomerRepository customerRepository;
 
-    public JwtFilter(JwtService jwtService, CustomerRepository customerRepository) { // <--- Ajuste no construtor
+    public JwtFilter(JwtService jwtService, CustomerRepository customerRepository) {
         this.jwtService = jwtService;
-        this.customerRepository = customerRepository; // <--- Inicialização
+        this.customerRepository = customerRepository;
     }
 
     @Override
@@ -38,12 +36,12 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // --- AQUI ESTÁ A CORREÇÃO: PERMITIR ACESSO PÚBLICO A PRODUTOS E AUTENTICAÇÃO ---
-        if (path.startsWith("/api/auth") ||                  // Login/Autenticação
-                path.startsWith("/api/customer/register") ||     // Registro de cliente
-                path.equals("/api/products") ||                  // Listar TODOS os produtos (GET /api/products)
-                path.startsWith("/api/products/") ||             // Detalhes de um produto (GET /api/products/{id})
-                path.startsWith("/api/home")                     // Se /api/home também for público
+        // --- PERMITIR ACESSO PÚBLICO A PRODUTOS E AUTENTICAÇÃO ---
+        if (path.startsWith("/api/auth") ||
+                path.startsWith("/api/customer/register") ||
+                path.equals("/api/products") ||
+                path.startsWith("/api/products/") ||
+                path.startsWith("/api/home")
         ) {
             System.out.println("JWT Filter: Path '" + path + "' bypassed (Public Access).");
             filterChain.doFilter(request, response);
@@ -53,7 +51,7 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String authorization = request.getHeader("Authorization");
 
-        // NOVO: Se não houver token para uma rota protegida, loga e passa o filtro para que o Spring Security retorne 403
+
         if (authorization == null || !authorization.startsWith("Bearer ")) {
             System.out.println("JWT Filter: No valid Authorization header found for protected path '" + path + "'. Access will be denied by Spring Security.");
             filterChain.doFilter(request, response);
@@ -72,7 +70,7 @@ public class JwtFilter extends OncePerRequestFilter {
             System.out.println(String.format("[Backend - %s] JWT Filter: Extracted email: %s.", requestId, email));
         } catch (Exception e) {
             System.err.println(String.format("[Backend - %s] JWT Filter: Error extracting email from token for path '%s': %s", requestId, path, e.getMessage()));
-            // Não autentica, o Spring Security vai barrar
+
             filterChain.doFilter(request, response);
             return;
         }
@@ -80,11 +78,8 @@ public class JwtFilter extends OncePerRequestFilter {
         if (email != null && SecurityContextHolder.getContext().getAuthentication() == null) {
             UserDetails user = null;
             try {
-                // Ao invés de userDetailsServiceImpl, use customerRepository para carregar o UserDetails
-                // Isso evita problemas de ciclo de vida com UserDetailsServiceImpl no filtro,
-                // e garante que o objeto UserDetails é o seu Customer, se você o implementou como UserDetails.
                 Customer customer = customerRepository.findByEmail(email)
-                        .orElse(null); // Retorna null se não encontrar
+                        .orElse(null);
 
                 if (customer != null) {
                     user = customer; // Assumindo que sua entidade Customer implementa UserDetails
@@ -108,7 +103,7 @@ public class JwtFilter extends OncePerRequestFilter {
             }
         } else if (SecurityContextHolder.getContext().getAuthentication() != null) {
             System.out.println(String.format("[Backend - %s] JWT Filter: Authentication already exists in SecurityContext for path '%s'. Skipping.", requestId, path));
-        } else if (email == null) { // Caso email não seja extraído
+        } else if (email == null) {
             System.out.println(String.format("[Backend - %s] JWT Filter: Email could not be extracted from token for path '%s'. Authentication NOT set.", requestId, path));
         }
 

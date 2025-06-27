@@ -47,11 +47,11 @@ public class CustomerService {
         Customer customer = customerRepository.findByIdWithAddresses(id_customer)
                 .orElseThrow(() -> new RuntimeException("Usuário não encontrado."));
 
-        // --- CORREÇÃO AQUI: REUTILIZAR O AddressMapper.toDTO ---
+
         List<AddressResponseDTO> addressDTOs = customer.getAddresses().stream()
-                .map(AddressMapper::toDTO) // <--- Use o método toDTO do AddressMapper
+                .map(AddressMapper::toDTO)
                 .collect(Collectors.toList());
-        // -----------------------------------------------------
+
 
         return new CustomerProfileDTO(
                 customer.getName(),

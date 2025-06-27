@@ -12,11 +12,9 @@ import java.util.stream.Collectors;
 
 public class OrderMapper {
 
-    // Converte OrderCreateRequestDTO para a entidade Order
-    // Precisa do Customer e da lista de Product para montar os OrderItems
     public static Order toEntity(OrderCreateRequestDTO dto, Customer customer, List<Product> products, Address deliveryAddress) {
         if (dto == null || customer == null || products == null) {
-            // Ou lance uma exceção, ou retorne null, dependendo da sua estratégia de erro
+
             return null;
         }
 
@@ -46,13 +44,13 @@ public class OrderMapper {
         }
 
         order.setTotalAmount(totalAmount);
-        // Usar addOrderItem para garantir a relação bidirecional
-        orderItems.forEach(order::addOrderItem); // Adiciona um por um para setar a referência Order no OrderItem
+
+        orderItems.forEach(order::addOrderItem);
 
         return order;
     }
 
-    // Converte a entidade Order para OrderResponseDTO
+
     public static OrderResponseDTO toDTO(Order order) {
         if (order == null) {
             return null;
@@ -61,7 +59,7 @@ public class OrderMapper {
         List<OrderItemResponseDTO> itemResponses = new ArrayList<>();
         if (order.getItems() != null) {
             itemResponses = order.getItems().stream()
-                    .map(OrderItemMapper::toDTO) // Reutiliza OrderItemMapper para converter itens
+                    .map(OrderItemMapper::toDTO)
                     .collect(Collectors.toList());
         }
 

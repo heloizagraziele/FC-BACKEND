@@ -3,7 +3,6 @@ package br.com.gooddreams.api.controllers;
 import br.com.gooddreams.api.dtos.OrderCreateRequestDTO;
 import br.com.gooddreams.api.dtos.OrderResponseDTO;
 import br.com.gooddreams.api.dtos.OrderUpdateDTO;
-import br.com.gooddreams.api.entities.Customer;
 import br.com.gooddreams.api.services.OrderService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -18,7 +17,7 @@ public class OrderController {
 
 
     @Autowired
-    private final OrderService orderService; // <--- Injeção via construtor (melhor prática)
+    private final OrderService orderService;
 
     public OrderController(OrderService orderService) {
         this.orderService = orderService;
@@ -52,21 +51,21 @@ public class OrderController {
     // Atualizar dados do pedido
     @PatchMapping("/{id}")
     public ResponseEntity<?> update(
-            @PathVariable("id") Long id, // <--- ADICIONAR: Recebe o ID da URL
+            @PathVariable("id") Long id,
             @RequestBody OrderUpdateDTO orderUpdateDTO) {
         try {
-            OrderResponseDTO updated = orderService.update(id, orderUpdateDTO); // <--- Passa o ID para o serviço
+            OrderResponseDTO updated = orderService.update(id, orderUpdateDTO);
             return new ResponseEntity<>(updated, HttpStatus.OK);
-        } catch (RuntimeException e) { // Capturar RuntimeException para mensagens customizadas
-            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND); // Ou BAD_REQUEST, dependendo do erro
-        } catch (Exception e) { // Catch genérico para outros erros inesperados
+        } catch (RuntimeException e) {
+            return new ResponseEntity<>(e.getMessage(), HttpStatus.NOT_FOUND);
+        } catch (Exception e) {
             return new ResponseEntity<>("Erro interno ao atualizar pedido.", HttpStatus.INTERNAL_SERVER_ERROR);
         }
     }
 
     // Deletar um pedido
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> destroy(@PathVariable long id) { // Note: 'long' pode ser 'Long' para consistência
+    public ResponseEntity<String> destroy(@PathVariable long id) {
         try {
             orderService.destroy(id);
             return new ResponseEntity<>("Pedido deletado com sucesso.", HttpStatus.OK);

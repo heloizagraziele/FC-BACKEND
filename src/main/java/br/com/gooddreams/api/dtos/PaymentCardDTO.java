@@ -20,7 +20,6 @@ public record PaymentCardDTO(
 
     public record Payer(
             String email
-            // pode adicionar identification se quiser
     ) {
     }
 }

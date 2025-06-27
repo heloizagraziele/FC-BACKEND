@@ -8,7 +8,7 @@ import br.com.gooddreams.api.entities.Product;
 
 public class OrderItemMapper {
 
-    // Mantenha APENAS esta sobrecarga para toEntity, que é a usada pelo OrderService.createOrder
+
     public static OrderItem toEntity(OrderItemRequestDTO dto, Order order, Product product) {
         if (dto == null || order == null || product == null) {
             throw new IllegalArgumentException("Dados incompletos para mapear OrderItem. Requer DTO, Order e Product.");
@@ -22,7 +22,7 @@ public class OrderItemMapper {
         return orderItem;
     }
 
-    // Mantenha esta para toDTO
+
     public static OrderItemResponseDTO toDTO(OrderItem orderItem) {
         if (orderItem == null) {
             return null;

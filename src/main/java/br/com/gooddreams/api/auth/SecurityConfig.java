@@ -31,9 +31,9 @@ public class SecurityConfig {
     @Bean
     public SecurityFilterChain filterChain(HttpSecurity httpSecurity) throws Exception {
         return httpSecurity
-                // <--- MUDANÇA CRÍTICA AQUI: Use .cors(withDefaults()) e REMOVA o .and()
-                .cors(withDefaults()) // Habilita o CORS usando o CorsConfigurationSource já existente (do CorsConfig.java)
-                .csrf(csrf -> csrf.disable()) // Agora .csrf() é chamado diretamente em httpSecurity
+
+                .cors(withDefaults())
+                .csrf(csrf -> csrf.disable())
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers("/api/auth", "/api/customer/register", "/api/products/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/addresses").authenticated()

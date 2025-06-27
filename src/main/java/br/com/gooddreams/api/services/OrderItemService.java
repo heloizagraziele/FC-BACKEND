@@ -28,21 +28,21 @@ public class OrderItemService {
     }
 
     @Transactional
-    public OrderItemResponseDTO create(Long orderId, OrderItemRequestDTO itemDto) { // Assinatura OK
-        // 1. Buscar a Order e o Product pelo ID (usando os parâmetros orderId e itemDto.productId())
-        Order order = orderRepository.findById(orderId) // <--- CORREÇÃO AQUI: Usa 'orderId' do parâmetro
-                .orElseThrow(() -> new RuntimeException("Ordem não encontrada com ID: " + orderId)); // <--- CORREÇÃO AQUI
+    public OrderItemResponseDTO create(Long orderId, OrderItemRequestDTO itemDto) {
 
-        Product product = productRepository.findById(itemDto.productId()) // Usa itemDto.productId()
+        Order order = orderRepository.findById(orderId)
+                .orElseThrow(() -> new RuntimeException("Ordem não encontrada com ID: " + orderId));
+
+        Product product = productRepository.findById(itemDto.productId())
                 .orElseThrow(() -> new RuntimeException("Produto não encontrado com ID: " + itemDto.productId()));
 
-        // 2. Criar a entidade OrderItem usando o Mapper
+
         OrderItem orderItem = OrderItemMapper.toEntity(itemDto, order, product);
 
-        // 3. Salvar o OrderItem
+
         OrderItem saved = orderItemRepository.save(orderItem);
 
-        // 4. Retornar o DTO de resposta
+
         return OrderItemMapper.toDTO(saved);
     }
 
@@ -54,16 +54,16 @@ public class OrderItemService {
     }
 
     @Transactional
-    public OrderItemResponseDTO show(long id) { // Assinatura OK
-        OrderItem orderItem = orderItemRepository.findById(id) // <--- CORREÇÃO AQUI: Usa 'id' do parâmetro
-                .orElseThrow(() -> new RuntimeException("Item com o id " + id + " não foi encontrado.")); // <--- CORREÇÃO AQUI
+    public OrderItemResponseDTO show(long id) {
+        OrderItem orderItem = orderItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item com o id " + id + " não foi encontrado."));
         return OrderItemMapper.toDTO(orderItem);
     }
 
     @Transactional
-    public OrderItemResponseDTO update(Long id, OrderItemRequestDTO dto) { // Assinatura OK
-        OrderItem orderItem = orderItemRepository.findById(id) // <--- CORREÇÃO AQUI: Usa 'id' do parâmetro
-                .orElseThrow(() -> new RuntimeException("Item de pedido não encontrado com ID: " + id)); // <--- CORREÇÃO AQUI
+    public OrderItemResponseDTO update(Long id, OrderItemRequestDTO dto) {
+        OrderItem orderItem = orderItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item de pedido não encontrado com ID: " + id));
 
         if (dto.quantity() != null && dto.quantity() > 0) {
             orderItem.setQuantity(dto.quantity());
@@ -75,9 +75,9 @@ public class OrderItemService {
     }
 
     @Transactional
-    public void destroy(long id) { // Assinatura OK
-        OrderItem orderItem = orderItemRepository.findById(id) // <--- CORREÇÃO AQUI: Usa 'id' do parâmetro
-                .orElseThrow(() -> new RuntimeException("Item com o id " + id + " não foi encontrado.")); // <--- CORREÇÃO AQUI
+    public void destroy(long id) {
+        OrderItem orderItem = orderItemRepository.findById(id)
+                .orElseThrow(() -> new RuntimeException("Item com o id " + id + " não foi encontrado."));
         orderItemRepository.delete(orderItem);
     }
 }
