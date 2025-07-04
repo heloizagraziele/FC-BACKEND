@@ -47,7 +47,7 @@ public class AddressController {
     }
 
 
-    @GetMapping("/me") // Ex: GET /api/addresses/me
+    @GetMapping("/me")
     public ResponseEntity<List<AddressResponseDTO>> getAddressesForAuthenticatedCustomer(Principal principal) {
         String authenticatedUserEmail = principal.getName();
 
@@ -73,7 +73,6 @@ public class AddressController {
         List<AddressResponseDTO> addresses = addressService.getAddressesByCustomerId(customerId);
         return ResponseEntity.ok(addresses);
     }
-    // -------------------------------------------------------------------------------------------------------
 
     @GetMapping("/{id_address}")
     public ResponseEntity<AddressResponseDTO> show(@PathVariable long id_address, Principal principal){

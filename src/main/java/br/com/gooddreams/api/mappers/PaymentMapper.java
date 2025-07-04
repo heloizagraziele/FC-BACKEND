@@ -2,7 +2,6 @@ package br.com.gooddreams.api.mappers;
 
 import br.com.gooddreams.api.dtos.PaymentCreateDTO;
 import br.com.gooddreams.api.dtos.PaymentResponseDTO;
-import br.com.gooddreams.api.dtos.PaymentUpdateDTO;
 import br.com.gooddreams.api.entities.Order;
 import br.com.gooddreams.api.entities.Payment;
 

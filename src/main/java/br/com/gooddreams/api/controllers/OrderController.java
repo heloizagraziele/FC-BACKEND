@@ -3,43 +3,57 @@ package br.com.gooddreams.api.controllers;
 import br.com.gooddreams.api.dtos.OrderCreateRequestDTO;
 import br.com.gooddreams.api.dtos.OrderResponseDTO;
 import br.com.gooddreams.api.dtos.OrderUpdateDTO;
+import br.com.gooddreams.api.entities.Customer; // Importe Customer
+import br.com.gooddreams.api.repository.CustomerRepository; // Importe CustomerRepository
 import br.com.gooddreams.api.services.OrderService;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.security.Principal; // Importe Principal
 import java.util.List;
 
 @RestController
 @RequestMapping("/api/orders")
 public class OrderController {
 
-
-    @Autowired
     private final OrderService orderService;
+    private final CustomerRepository customerRepository;
 
-    public OrderController(OrderService orderService) {
+    public OrderController(OrderService orderService, CustomerRepository customerRepository) {
         this.orderService = orderService;
+        this.customerRepository = customerRepository;
     }
 
-    // Criar um novo pedido (order)
     @PostMapping
-    public ResponseEntity<OrderResponseDTO> create(@RequestBody OrderCreateRequestDTO orderCreateRequestDTO) { // <--- Nome do DTO e @Valid
-        OrderResponseDTO response = orderService.createOrder(orderCreateRequestDTO); // <--- Chamar createOrder
+    public ResponseEntity<OrderResponseDTO> create(@RequestBody OrderCreateRequestDTO orderCreateRequestDTO) {
+        OrderResponseDTO response = orderService.createOrder(orderCreateRequestDTO);
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Listar todos os pedidos
     @GetMapping
     public ResponseEntity<List<OrderResponseDTO>> list() {
         List<OrderResponseDTO> orders = orderService.list();
         return new ResponseEntity<>(orders, HttpStatus.OK);
     }
 
-    // Buscar pedido por ID
+    @GetMapping("/customer/{customerId}")
+    public ResponseEntity<List<OrderResponseDTO>> getOrdersByCustomerId(@PathVariable Long customerId, Principal principal) {
+        String authenticatedUserEmail = principal.getName();
+
+        Customer authenticatedCustomer = customerRepository.findByEmail(authenticatedUserEmail)
+                .orElseThrow(() -> new RuntimeException("Cliente autenticado não encontrado."));
+
+        if (!authenticatedCustomer.getId().equals(customerId)) {
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();
+        }
+
+        List<OrderResponseDTO> orders = orderService.getOrdersByCustomerId(customerId);
+        return ResponseEntity.ok(orders);
+    }
+
     @GetMapping("/{id}")
-    public ResponseEntity<?> show(@PathVariable long id) { // Note: 'long' pode ser 'Long' para consistência
+    public ResponseEntity<?> show(@PathVariable Long id) {
         try {
             OrderResponseDTO order = orderService.show(id);
             return new ResponseEntity<>(order, HttpStatus.OK);
@@ -48,7 +62,6 @@ public class OrderController {
         }
     }
 
-    // Atualizar dados do pedido
     @PatchMapping("/{id}")
     public ResponseEntity<?> update(
             @PathVariable("id") Long id,
@@ -63,9 +76,8 @@ public class OrderController {
         }
     }
 
-    // Deletar um pedido
     @DeleteMapping("/{id}")
-    public ResponseEntity<String> destroy(@PathVariable long id) {
+    public ResponseEntity<String> destroy(@PathVariable Long id) {
         try {
             orderService.destroy(id);
             return new ResponseEntity<>("Pedido deletado com sucesso.", HttpStatus.OK);

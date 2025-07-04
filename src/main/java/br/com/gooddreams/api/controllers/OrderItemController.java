@@ -29,7 +29,6 @@ public class OrderItemController {
         return new ResponseEntity<>(response, HttpStatus.CREATED);
     }
 
-    // Listar todos os itens de pedido
     @GetMapping
     public ResponseEntity<List<OrderItemResponseDTO>> list() {
         List<OrderItemResponseDTO> items = orderItemService.list();

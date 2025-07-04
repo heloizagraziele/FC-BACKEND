@@ -34,7 +34,7 @@ public class AddressMapper {
 
 
     public static Address toEntity(AddressCreateDTO dto, Customer customer) {
-        if (dto == null || customer == null) { // 'customer' agora está definido aqui
+        if (dto == null || customer == null) {
             throw new IllegalArgumentException("AddressCreateDTO e Customer não podem ser nulos.");
         }
         Address address = new Address();

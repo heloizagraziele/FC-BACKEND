@@ -11,7 +11,6 @@ import br.com.gooddreams.api.repository.CustomerRepository;
 import br.com.gooddreams.api.repository.OrderRepository;
 import br.com.gooddreams.api.repository.ProductRepository;
 import jakarta.transaction.Transactional;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
 import java.math.BigDecimal;
@@ -26,14 +25,13 @@ public class OrderService {
     private final OrderRepository orderRepository;
     private final CustomerRepository customerRepository;
     private final ProductRepository productRepository;
+    private final AddressRepository addressRepository;
 
-    @Autowired
-    private AddressRepository addressRepository;
-
-    public OrderService(OrderRepository orderRepository, CustomerRepository customerRepository, ProductRepository productRepository) {
+    public OrderService(OrderRepository orderRepository, CustomerRepository customerRepository, ProductRepository productRepository, AddressRepository addressRepository) {
         this.orderRepository = orderRepository;
         this.customerRepository = customerRepository;
         this.productRepository = productRepository;
+        this.addressRepository = addressRepository;
     }
 
     @Transactional
@@ -41,16 +39,19 @@ public class OrderService {
         Customer customer = customerRepository.findById(dto.customerId())
                 .orElseThrow(() -> new RuntimeException("Cliente não encontrado."));
 
+        Address deliveryAddress = addressRepository.findById(dto.deliveryAddressId())
+                .orElseThrow(() -> new RuntimeException("Endereço de entrega não encontrado."));
+
         Order order = new Order();
         order.setCustomer(customer);
+        order.setDeliveryAddress(deliveryAddress);
         order.setCreatedAt(Instant.now());
         order.setStatus(OrderStatus.PENDING);
         order.setPaymentMethod(PaymentMethod.CREDIT_CARD);
-        order.setPaymentMethod(null);
 
 
         List<Long> productIds = dto.items().stream()
-                .map(item -> item.productId())
+                .map(OrderItemRequestDTO::productId)
                 .collect(Collectors.toList());
         List<Product> productsInOrder = productRepository.findAllById(productIds);
 
@@ -85,6 +86,15 @@ public class OrderService {
                 .map(OrderMapper::toDTO)
                 .toList();
     }
+
+    @Transactional
+    public List<OrderResponseDTO> getOrdersByCustomerId(Long customerId) {
+        List<Order> orders = orderRepository.findByCustomerId(customerId);
+        return orders.stream()
+                .map(OrderMapper::toDTO)
+                .collect(Collectors.toList());
+    }
+
 
 
     @Transactional

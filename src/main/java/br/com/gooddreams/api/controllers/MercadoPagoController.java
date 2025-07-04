@@ -114,5 +114,4 @@ public class MercadoPagoController {
         }
     }
 
-    // ... (Seu método /confirmar) ...
 }

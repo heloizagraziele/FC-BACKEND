@@ -36,7 +36,6 @@ public class JwtFilter extends OncePerRequestFilter {
 
         String path = request.getRequestURI();
 
-        // --- PERMITIR ACESSO PÚBLICO A PRODUTOS E AUTENTICAÇÃO ---
         if (path.startsWith("/api/auth") ||
                 path.startsWith("/api/customer/register") ||
                 path.equals("/api/products") ||
@@ -47,7 +46,6 @@ public class JwtFilter extends OncePerRequestFilter {
             filterChain.doFilter(request, response);
             return;
         }
-        // -----------------------------------------------------------------------------
 
         String authorization = request.getHeader("Authorization");
 
@@ -82,7 +80,7 @@ public class JwtFilter extends OncePerRequestFilter {
                         .orElse(null);
 
                 if (customer != null) {
-                    user = customer; // Assumindo que sua entidade Customer implementa UserDetails
+                    user = customer;
                 } else {
                     System.out.println(String.format("[Backend - %s] JWT Filter: Customer not found for email: %s.", requestId, email));
                 }

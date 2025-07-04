@@ -13,9 +13,8 @@ public class ProductVariation {
     private String size;
     private Integer stock;
 
-   // private Long productId;
     @ManyToOne
-    @JoinColumn(name="product_id", nullable=false) //isso garante no banco que toda variação estará ligada a um produto
+    @JoinColumn(name="product_id", nullable=false)
     private Product product;
 
     public ProductVariation() {}

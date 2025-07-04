@@ -14,7 +14,6 @@ import org.springframework.security.core.Authentication;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.List;
-import java.util.Map;
 
 @RestController
 @RequestMapping("/api/customer")
@@ -47,7 +46,6 @@ public class CustomerController {
         // Retorna o DTO completo com email, name e customerId
         return ResponseEntity.ok(new AuthResponseDTO(token, customer.getName(), customer.getEmail(), customer.getId()));
     }
-    // -----------------------------------------------------------------
 
     @PostMapping("/register")
     public ResponseEntity<CustomerResponseDTO> store(@RequestBody CustomerCreateDTO customerCreateDTO) {

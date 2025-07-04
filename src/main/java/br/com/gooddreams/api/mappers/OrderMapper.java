@@ -3,6 +3,7 @@ package br.com.gooddreams.api.mappers;
 import br.com.gooddreams.api.dtos.*;
 import br.com.gooddreams.api.entities.*;
 import br.com.gooddreams.api.enuns.OrderStatus;
+import br.com.gooddreams.api.enuns.PaymentMethod;
 
 import java.math.BigDecimal;
 import java.time.Instant;
@@ -11,18 +12,18 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 public class OrderMapper {
+    public static Order toEntity(OrderCreateRequestDTO dto, Customer customer, List<Product> products, Address deliveryAddress, PaymentMethod paymentMethod) {
+        if (dto == null || customer == null || products == null || deliveryAddress == null) {
 
-    public static Order toEntity(OrderCreateRequestDTO dto, Customer customer, List<Product> products, Address deliveryAddress) {
-        if (dto == null || customer == null || products == null) {
-
-            return null;
+            throw new IllegalArgumentException("Parâmetros para criar Order não podem ser nulos.");
         }
 
         Order order = new Order();
         order.setCustomer(customer);
+        order.setDeliveryAddress(deliveryAddress);
         order.setCreatedAt(Instant.now());
         order.setStatus(OrderStatus.PENDING);
-        order.setPaymentMethod(null);
+        order.setPaymentMethod(paymentMethod);
 
         BigDecimal totalAmount = BigDecimal.ZERO;
         List<OrderItem> orderItems = new ArrayList<>();
@@ -44,13 +45,10 @@ public class OrderMapper {
         }
 
         order.setTotalAmount(totalAmount);
-
         orderItems.forEach(order::addOrderItem);
 
         return order;
     }
-
-
     public static OrderResponseDTO toDTO(Order order) {
         if (order == null) {
             return null;
@@ -63,9 +61,15 @@ public class OrderMapper {
                     .collect(Collectors.toList());
         }
 
+        AddressResponseDTO addressResponseDTO = null;
+        if (order.getDeliveryAddress() != null) {
+            addressResponseDTO = AddressMapper.toDTO(order.getDeliveryAddress());
+        }
+
         return new OrderResponseDTO(
                 order.getId(),
                 order.getCustomer() != null ? order.getCustomer().getId() : null,
+                addressResponseDTO,
                 order.getTotalAmount(),
                 order.getStatus(),
                 order.getCreatedAt(),

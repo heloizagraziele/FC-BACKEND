@@ -24,6 +24,10 @@ public class Order {
     @JoinColumn(name="customer_id", nullable = false)
     private Customer customer;
 
+    @ManyToOne
+    @JoinColumn(name = "delivery_address_id", nullable = false)
+    private Address deliveryAddress;
+
     private BigDecimal totalAmount;
 
     @CreatedDate
@@ -43,11 +47,11 @@ public class Order {
     public Order(Customer customer, BigDecimal totalAmount, Address deliveryAddress, OrderStatus status, PaymentMethod paymentMethod){
         this.customer = customer;
         this.totalAmount = totalAmount;
+        this.deliveryAddress = deliveryAddress;
         this.status = status;
         this.paymentMethod = paymentMethod;
     }
 
-    // --- Getters e Setters ---
     public Long getId() {
         return id;
     }
@@ -59,6 +63,16 @@ public class Order {
     }
     public void setCustomer(Customer customer) {
         this.customer = customer;
+    }
+
+    // Novo Getter para deliveryAddress
+    public Address getDeliveryAddress() {
+        return deliveryAddress;
+    }
+
+    // Novo Setter para deliveryAddress
+    public void setDeliveryAddress(Address deliveryAddress) {
+        this.deliveryAddress = deliveryAddress;
     }
 
     public BigDecimal getTotalAmount() {
